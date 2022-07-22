@@ -3,28 +3,28 @@ let total = document.querySelector(".total");
 let botones = document.getElementsByClassName("comprar");
 //STOCK DE LIBROS
 
-function Libro 
-  (nombre, autor, precio, id, stock) {
-    this.nombre = nombre;
-    this.autor = autor;
-    this.precio = precio;
-    this.id = id;
-    this.stock = stock;
+function Libro(nombre, autor, precio, id, stock, cant = 0) {
+  this.nombre = nombre;
+  this.autor = autor;
+  this.precio = precio;
+  this.id = id;
+  this.stock = stock;
+  this.cant = cant;
 
-  this.hayStock = function() {
+  this.hayStock = function () {
     if (this.stock > 0) {
-      this.stock--
+      this.stock--;
       return true;
     }
-    if (libro.stock == 0) {
+    if (libros.stock == 0) {
       console.log("No hay mas en stock");
       return false;
     }
-    if (libro.stock < unidades) {
+    if (libros.stock < cant) {
       console.log("La cantidad ingresada excede el stock");
       return false;
     }
-  }
+  };
 }
 
 const libros = [];
@@ -41,7 +41,6 @@ libros.push(
 );
 libros.push(new Libro("Bajo La misma Estrella", "John Green", 2500, 03, 10));
 
-
 let temp = document.querySelector("template");
 let caja = temp.content.querySelector("div"); // ESTE UTILIZO PARA AGREGARITEM
 let claseCajas = document.querySelector("section#caja");
@@ -56,19 +55,16 @@ for (let libro of libros) {
   claseCajas.appendChild(clonado);
 }
 
-for( let i =0; i < libros.length; i++) {
-  botones[i].addEventListener("click",() =>{
-    comprar(libros[i])
-  })
+for (let i = 0; i < libros.length; i++) {
+  botones[i].addEventListener("click", () => {
+    comprar(libros[i]);
+  });
 }
 
-
-function Carrito
-  (nombre, total = 0) {
-    this.nombre = nombre;
-    this.total = total;
-    this.productos = [];
-
+function Carrito(nombre = "Usuario", total = 0) {
+  this.nombre = nombre;
+  this.total = total;
+  this.productos = [];
 
   /*   hayStock(libro, unidades) {
     if (libro.stock != 0 && libro.stock >= unidades) {
@@ -97,37 +93,38 @@ function Carrito
     }
   } */
 
-  this.agregarItem = function(libro) {
-    if (libro.hayStock(libro) && this.productos[libro.id] == undefined) {
-      this.productos[libro.id] = libro
-      this.productos[libro.id].cant++
+  this.agregarItem = function (libros) {
+    if (libros.hayStock(libros)) {
+      if (this.productos[libros.id] == undefined) {
+        this.productos[libros.id] = libros;
+      }
+      this.productos[libros.id].cant++;
     } else {
       return console.log("No hay stock");
     }
-    actualizar()
-  }
+    actualizar();
+  };
 
-  this.precioTotal = function(){
-    let totalP = 0; 
-    for (producto of this.productos){
-      if (producto != undefined){
-        totalP += producto.precio * producto.cant
+  this.precioTotal = function () {
+    let totalP = 0;
+    for (producto of this.productos) {
+      if (producto != undefined) {
+        totalP += producto.precio * producto.cant;
       }
     }
-    this.total = totalP
+    this.total = totalP;
     return totalP;
-  }
-
+  };
 }
 
 let carrito;
 
 if (sessionStorage.carrito == undefined) {
   carrito = new Carrito();
-}else{
-  carritoSS = JSON.parse(sessionStorage.carrito)
-  carrito = new Carrito (carritoSS.nombre, carritoSS.total, carritoSS.productos)
-  actualizar()
+} else {
+  carritoSS = JSON.parse(sessionStorage.carrito);
+  carrito = new Carrito(carritoSS.nombre, carritoSS.total, carritoSS.productos);
+  actualizar();
 }
 
 /* for (let i = 0; i < carrito.productos.length; i++) {
@@ -139,16 +136,16 @@ const iva = (x) => x * valorIVA;
 let precioFinal = total + iva(total) + envio;
  */
 
-function comprar(producto){
-  console.log(carrito)
-  carrito.agregarItem(producto)
+function comprar(producto) {
+  console.log(carrito);
+  carrito.agregarItem(producto);
 }
 
-function actualizar(){
-  total.textContent = `Total: ${carrito.precioTotal()}$`
-  sessionStorage.carrito = JSON.stringify(carrito)
+function actualizar() {
+  total.textContent = `Total: ${carrito.precioTotal()}$`;
+  sessionStorage.carrito = JSON.stringify(carrito);
 }
 
-
-let envio = 1000;
+/* let envio = 1000;
 let valorIVA = 0.21;
+ */
