@@ -1,18 +1,34 @@
 //SIMULADOR DE COMPRAS
-
+let total = document.querySelector(".total");
+let botones = document.getElementsByClassName("comprar");
 //STOCK DE LIBROS
 
-class Libro {
-  constructor(nombre, autor, precio, id, stock) {
+function Libro 
+  (nombre, autor, precio, id, stock) {
     this.nombre = nombre;
     this.autor = autor;
     this.precio = precio;
     this.id = id;
     this.stock = stock;
+
+  this.hayStock = function() {
+    if (this.stock > 0) {
+      this.stock--
+      return true;
+    }
+    if (libro.stock == 0) {
+      console.log("No hay mas en stock");
+      return false;
+    }
+    if (libro.stock < unidades) {
+      console.log("La cantidad ingresada excede el stock");
+      return false;
+    }
   }
 }
 
 const libros = [];
+
 libros.push(new Libro("Vermeer:La Obra Completa", "Karl Shutz", 5000, 01, 3));
 libros.push(
   new Libro(
@@ -25,8 +41,9 @@ libros.push(
 );
 libros.push(new Libro("Bajo La misma Estrella", "John Green", 2500, 03, 10));
 
+
 let temp = document.querySelector("template");
-let caja = temp.content.querySelector("div");
+let caja = temp.content.querySelector("div"); // ESTE UTILIZO PARA AGREGARITEM
 let claseCajas = document.querySelector("section#caja");
 
 for (let libro of libros) {
@@ -39,14 +56,21 @@ for (let libro of libros) {
   claseCajas.appendChild(clonado);
 }
 
-class Carrito {
-  constructor(nombre, total = 0 ) {
+for( let i =0; i < libros.length; i++) {
+  botones[i].addEventListener("click",() =>{
+    comprar(libros[i])
+  })
+}
+
+
+function Carrito
+  (nombre, total = 0) {
     this.nombre = nombre;
     this.total = total;
     this.productos = [];
-  }
 
-  hayStock(libro, unidades) {
+
+  /*   hayStock(libro, unidades) {
     if (libro.stock != 0 && libro.stock >= unidades) {
       return true;
     }
@@ -58,9 +82,9 @@ class Carrito {
       console.log("La cantidad ingresada excede el stock");
       return false;
     }
-  }
+  } */
 
-  agregarItem(libro, unidades) {
+  /*   agregarItem(libro, unidades) {
     if (
       this.hayStock(libro, unidades) &&
       this.productos.find((el) => el.id == libro.id) == null
@@ -71,32 +95,60 @@ class Carrito {
     } else {
       return false;
     }
+  } */
+
+  this.agregarItem = function(libro) {
+    if (libro.hayStock(libro) && this.productos[libro.id] == undefined) {
+      this.productos[libro.id] = libro
+      this.productos[libro.id].cant++
+    } else {
+      return console.log("No hay stock");
+    }
+    actualizar()
   }
+
+  this.precioTotal = function(){
+    let totalP = 0; 
+    for (producto of this.productos){
+      if (producto != undefined){
+        totalP += producto.precio * producto.cant
+      }
+    }
+    this.total = totalP
+    return totalP;
+  }
+
 }
 
-const carrito = new Carrito();
+let carrito;
 
-const imgAdd = document.getElementsByClassName("foto");
+if (sessionStorage.carrito == undefined) {
+  carrito = new Carrito();
+}else{
+  carritoSS = JSON.parse(sessionStorage.carrito)
+  carrito = new Carrito (carritoSS.nombre, carritoSS.total, carritoSS.productos)
+  actualizar()
+}
 
-imgAdd[0].onclick = () => {
-  const idBuscado = 1;
-  const elementoLibro = libros.find((elemento) => elemento.id == idBuscado);
-  carrito.agregarItem(elementoLibro, 1);
-};
-
-let total = querySelector("#total");
-let botones = querySelectorAll(".comprar");
-let envio = 1000;
-let valorIVA = 0.21;  
-
-for (let i = 0; i < carrito.productos.length; i++) {
+/* for (let i = 0; i < carrito.productos.length; i++) {
   total += carrito.productos[i].precio;
 }
 
 const iva = (x) => x * valorIVA;
 
 let precioFinal = total + iva(total) + envio;
+ */
 
-//MUESTRO POR CONSOLA TOTAL Y TOTAL CON MODIFICACIONES CORRESPONDIENTES
-console.log("Total " + total);
-console.log("Total con envio + IVA = " + precioFinal);
+function comprar(producto){
+  console.log(carrito)
+  carrito.agregarItem(producto)
+}
+
+function actualizar(){
+  total.textContent = `Total: ${carrito.precioTotal()}$`
+  sessionStorage.carrito = JSON.stringify(carrito)
+}
+
+
+let envio = 1000;
+let valorIVA = 0.21;
